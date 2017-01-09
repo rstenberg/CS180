@@ -1,0 +1,172 @@
+Homework 6 * 3 pts%
+Weekly Quizzes: 10 * 1 %
+Exam 1: 26%
+Exam 2: 22%
+Exam 3: 24% - March 23rd (Thursday 10th week)
+	"Final" is non-cummulative (only last 6 lectures)
+
+Grading: Homework
+Goes live to CCLE (Monday 2pm) -> Upload to Gradescope (before next Monday 6:59 pm) -> Homework discussed in section (Friday following the deadline)
+Late Submissions = 0 pts
+Regrade: Ask on Gradescope within a week
+Attemps count: correct: 100%, serious attempt: 75%, reasonable attempt: 50%
+
+Quizzes
+Roughly 5 multiple choice questions
+Timed quiz
+Live on CCLE Wednesday 6:00 pm to Friday 5:59 pm
+
+
+----------------------- Introduction ------------------------
+
+What is an algorithm?
+"An algorithm is a finite, definite, effective procedure, with some input and some output"
+
+Ask two questions for every algorithm:
+1) Is the algorithm correct?
+2) How efficient is the algorithm?
+
+Must always define efficiency
+
+Want a general theory of efficiency that is:
+	1. Simple (mathematically)
+	2. Objective (doesn't depend on i5 vs i7 processor)
+	3. Captures scalability (input-sizes change)
+	4. Predictive of practical performance
+
+How we measure efficiency
+Most important resource in computing: TIME
+TIME: # of instructions executed in a simple programming language
+	Only simple operations (+, *, -, =, if, call)
+	Each operation takes one time step
+	Each memory access takes one time step
+	No fancy stuff built in (add these two matrices, copy this long string, ...)
+
+Things we've dropped from consideration:
+	1. Memory hierarchy
+		disk, caches, registers have many orders of magnitude differences in access time
+	2. Not all instructions take the same time in practice (+, /)
+	3. Communication
+	4. Different computers have different primitive instructions
+However:
+	One can usually tune implementations so that the hierarchy, etc., is not a huge factor
+
+Overarching Problem:
+	Algorithms can have different running times on different inputs
+	Smaller inputs take less time, larger inputs take more time
+Solution:
+	Measure performance on input size 'n'
+	Average-case complexity: Average # steps algorithm takes on inputs of size n
+	Worst-case complexity: Max # steps algorithm takes over all inputs of size n
+
+Pros/Cons:
+	Average-case:
+		Over what probability distribution? (diff people may have different "average" problems)
+		Analysis often hard
+	Worst-case
+		A fast algorithm has a comforting guarantee
+		Analysis easier than average-case
+		Userful in real-time applications (space shuttle, nuclear reactors)
+		May be too pessimistic
+
+Best-case...
+	Characterize growth-rate of (worst-case) run time as a function of problem size, up to a constant factor
+	Why not try to be more precise?
+		Technological variations (computer, compiler, OS, ...) can easily cause 10x difference
+		Not necessary to track EXACT run time of algorithm
+
+Complexity:
+	Complexity of an algorithm associates a number T(n) with each problem size n
+	T(n) = worst-case time taken on problems of size n
+
+Asymptotic Analysis:
+	Methodology for comparing run-times
+	Given two functions: f,g
+	f(n) = O(g(n)): iff there is a constant c>0 such that f(n) is eventually-always at MOST c*g(n)
+	f(n) = Omega(f(n))): iff there is a constant c>0 such that f(n) is eventually-always at LEAST c*g(n)
+	f(n) = Theta((g(n)): iff both hold, there are constants c1>0, c2>0 such that f(n) is eventually-always at MOST c1*g(n) and at LEAST c2*g(n)
+
+Polynomial time
+	P: running time is O(n^d) for some constant d independent of the input size n
+		ex: if constant d = 2, then doubling input size raises run-time by the power of 2
+
+Summary
+	Typical goal for algorithm is to find a 
+		Reasonably tight (i.e. Theta(n) if possible)
+		asymptotic (i.e. O(n) or Theta(n))
+		bound <- usually upper bound
+		worst case run-time as a function of problem size
+
+Exmaple: Multiplication
+	Calculating each row: O(n)
+	Adding up each column O(n)
+	Total time O(n^2)
+
+----------------------- Divide and Conquer -----------------------
+
+Steps:
+	1) Divide Problem into several subproblems
+	2) Solve each subproblem recursively
+	3) Combine solutions to subproblems into overall solution
+
+Most common usage:
+	Divide size n into two subproblems of size n/2 in linear time
+	Solve two subproblems recursively
+	Combine two solutions into overall solution in linear time
+	Run-time: O(n log n)!
+
+Obvious applications:
+	Organize an MP3 library
+	Display Google PageRank results
+	List RSS news items in reverse chronological order
+
+Some problems become easier onces sorted
+	Identifying statistical outliers
+
+Non-obvious applications
+	Convex hull
+	Closest pair of points
+	Interval scheduling / interval partitioning
+	Minimum spanning trees (Kruskal's algorithm)
+	Scheduling
+
+Why mergesort?
+	Much faster that "Selection", "insertion", "Bubble"
+	Sorting in Perl, Java,, Python, Android:
+		- Hybrid of mergesort and others
+	Excellent example of divide and conquer principles
+	Example:
+		1) Input: [ALGORITHMS] 											T(n)
+		2) Divide array into two halves [ALGOR] [ITHMS]					O(1)
+		3) Recursively sort left half and right half [AGLOR] [HIMST]	2T(n/2)
+		4) Merge elements of two halves into one array					O(n)
+
+		Merging:
+			Keep track of smallest element in sorted halves
+			Insert smallest of two elements into new array
+			Repeat until done
+
+	Is Mergesort any good?
+		Defn: T(n) = # comparisions made by mergesort in worst-case on array with n elements
+		Mergesort recurrence: T(1) = 1
+			T(n) 		=		T(n / 2) 	+ 	T(n/2) 			+ 	n
+			Total time 	= 	Sort left array + sort right array	+	merging
+		Need n comparisons to merge at every level
+		2(n/2) = n 		<- merging all (n/2)-element arrays (there are 2)
+		4(n/4) = n 		<- merging all (n/4)-element arrays (there are 4)
+		8(n/8) = n 		<- merging all (n/8)-element arrays	(there are 8)
+		.
+		.
+		2^k (n/2^k) = n <- merging all (n/2^k)-element arrays (there are 2^k)
+		.
+		.
+		(n/2)2 = n 		<- merging all 2-element arrays (there are (n/2))
+
+
+Master Method:
+	Solve common divide/conquer recurrences:
+		T(n) = aT(n/b) + f(n)
+		Terms:
+			a>=1 	is the number of subproblems
+			b>0 	is the factor by which subproblem size decreases
+			f(n) 	is work to divide/merge subproblems
